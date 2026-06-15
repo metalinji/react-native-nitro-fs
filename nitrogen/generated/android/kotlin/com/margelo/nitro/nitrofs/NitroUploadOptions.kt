@@ -39,7 +39,7 @@ data class NitroUploadOptions(
   }
 
   override fun hashCode(): Int {
-    return arrayOf(
+    return arrayOf<Any?>(
       url,
       method,
       field

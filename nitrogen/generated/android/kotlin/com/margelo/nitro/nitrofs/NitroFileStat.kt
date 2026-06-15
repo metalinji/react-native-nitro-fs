@@ -47,7 +47,7 @@ data class NitroFileStat(
   }
 
   override fun hashCode(): Int {
-    return arrayOf(
+    return arrayOf<Any?>(
       size,
       ctime,
       mtime,

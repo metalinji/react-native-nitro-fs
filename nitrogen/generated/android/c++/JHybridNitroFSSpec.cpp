@@ -17,6 +17,8 @@ namespace margelo::nitro::nitrofs { enum class NitroFileEncoding; }
 namespace margelo::nitro::nitrofs { struct NitroUploadOptions; }
 // Forward declaration of `NitroUploadMethod` to properly resolve imports.
 namespace margelo::nitro::nitrofs { enum class NitroUploadMethod; }
+// Forward declaration of `NitroDownloadOptions` to properly resolve imports.
+namespace margelo::nitro::nitrofs { struct NitroDownloadOptions; }
 
 #include <string>
 #include <NitroModules/Promise.hpp>
@@ -37,6 +39,9 @@ namespace margelo::nitro::nitrofs { enum class NitroUploadMethod; }
 #include <functional>
 #include "JFunc_void_double_double.hpp"
 #include <NitroModules/JNICallable.hpp>
+#include "NitroDownloadOptions.hpp"
+#include "JNitroDownloadOptions.hpp"
+#include <unordered_map>
 
 namespace margelo::nitro::nitrofs {
 
@@ -308,6 +313,22 @@ namespace margelo::nitro::nitrofs {
   std::shared_ptr<Promise<NitroFile>> JHybridNitroFSSpec::downloadFile(const std::string& serverUrl, const std::string& destinationPath, const std::optional<std::function<void(double /* downloadedBytes */, double /* totalBytes */)>>& onProgress) {
     static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<jni::JString> /* serverUrl */, jni::alias_ref<jni::JString> /* destinationPath */, jni::alias_ref<JFunc_void_double_double::javaobject> /* onProgress */)>("downloadFile_cxx");
     auto __result = method(_javaPart, jni::make_jstring(serverUrl), jni::make_jstring(destinationPath), onProgress.has_value() ? JFunc_void_double_double_cxx::fromCpp(onProgress.value()) : nullptr);
+    return [&]() {
+      auto __promise = Promise<NitroFile>::create();
+      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
+        auto __result = jni::static_ref_cast<JNitroFile>(__boxedResult);
+        __promise->resolve(__result->toCpp());
+      });
+      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
+        jni::JniException __jniError(__throwable);
+        __promise->reject(std::make_exception_ptr(__jniError));
+      });
+      return __promise;
+    }();
+  }
+  std::shared_ptr<Promise<NitroFile>> JHybridNitroFSSpec::downloadFileWithOptions(const NitroDownloadOptions& options, const std::optional<std::function<void(double /* downloadedBytes */, double /* totalBytes */)>>& onProgress) {
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<JNitroDownloadOptions> /* options */, jni::alias_ref<JFunc_void_double_double::javaobject> /* onProgress */)>("downloadFileWithOptions_cxx");
+    auto __result = method(_javaPart, JNitroDownloadOptions::fromCpp(options), onProgress.has_value() ? JFunc_void_double_double_cxx::fromCpp(onProgress.value()) : nullptr);
     return [&]() {
       auto __promise = Promise<NitroFile>::create();
       __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {

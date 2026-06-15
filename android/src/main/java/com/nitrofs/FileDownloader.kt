@@ -6,6 +6,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.onDownload
+import io.ktor.client.request.header
 import io.ktor.client.request.prepareGet
 import io.ktor.http.HttpMethod
 import io.ktor.http.isSuccess
@@ -20,6 +21,7 @@ class FileDownloader {
     suspend fun downloadFile(
         serverUrl: String,
         destinationPath: String,
+        requestHeaders: Map<String, String>?,
         onProgress: ((Double, Double) -> Unit)?
     ): NitroFile? {
         var contentType = ""
@@ -32,6 +34,9 @@ class FileDownloader {
         client.use { it
             it.prepareGet(serverUrl) {
                 method = HttpMethod.Get
+                requestHeaders?.forEach { (key, value) ->
+                    header(key, value)
+                }
                 onDownload { totalBytesSent, contentLength ->
                     if (totalBytesSent > 0 && contentLength != null){
                         onProgress?.let {

@@ -207,6 +207,7 @@ class NitroFSImpl {
     func downloadFile(
         serverUrl: String,
         destinationPath: String,
+        requestHeaders: [String: String]? = nil,
         onProgress: ((Double, Double) -> Void)?
     ) async throws -> NitroFile {
         guard let fileManager else {
@@ -216,6 +217,7 @@ class NitroFSImpl {
         return try await fileDownloader.downloadFile(
             serverUrl,
             destinationPath,
+            requestOptions: (method: nil, headers: requestHeaders),
             onProgress: onProgress
         )
     }

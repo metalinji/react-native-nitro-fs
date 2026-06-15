@@ -128,6 +128,15 @@ abstract class HybridNitroFSSpec: HybridObject() {
     val __result = downloadFile(serverUrl, destinationPath, onProgress?.let { it })
     return __result
   }
+  
+  abstract fun downloadFileWithOptions(options: NitroDownloadOptions, onProgress: ((downloadedBytes: Double, totalBytes: Double) -> Unit)?): Promise<NitroFile>
+  
+  @DoNotStrip
+  @Keep
+  private fun downloadFileWithOptions_cxx(options: NitroDownloadOptions, onProgress: Func_void_double_double?): Promise<NitroFile> {
+    val __result = downloadFileWithOptions(options, onProgress?.let { it })
+    return __result
+  }
 
   // Default implementation of `HybridObject.toString()`
   override fun toString(): String {

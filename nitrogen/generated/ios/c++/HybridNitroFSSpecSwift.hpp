@@ -22,6 +22,8 @@ namespace margelo::nitro::nitrofs { struct NitroFile; }
 namespace margelo::nitro::nitrofs { struct NitroUploadOptions; }
 // Forward declaration of `NitroUploadMethod` to properly resolve imports.
 namespace margelo::nitro::nitrofs { enum class NitroUploadMethod; }
+// Forward declaration of `NitroDownloadOptions` to properly resolve imports.
+namespace margelo::nitro::nitrofs { struct NitroDownloadOptions; }
 
 #include <string>
 #include <NitroModules/Promise.hpp>
@@ -33,6 +35,8 @@ namespace margelo::nitro::nitrofs { enum class NitroUploadMethod; }
 #include "NitroUploadMethod.hpp"
 #include <optional>
 #include <functional>
+#include "NitroDownloadOptions.hpp"
+#include <unordered_map>
 
 #include "NitroFS-Swift-Cxx-Umbrella.hpp"
 
@@ -229,6 +233,14 @@ namespace margelo::nitro::nitrofs {
     }
     inline std::shared_ptr<Promise<NitroFile>> downloadFile(const std::string& serverUrl, const std::string& destinationPath, const std::optional<std::function<void(double /* downloadedBytes */, double /* totalBytes */)>>& onProgress) override {
       auto __result = _swiftPart.downloadFile(serverUrl, destinationPath, onProgress);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::shared_ptr<Promise<NitroFile>> downloadFileWithOptions(const NitroDownloadOptions& options, const std::optional<std::function<void(double /* downloadedBytes */, double /* totalBytes */)>>& onProgress) override {
+      auto __result = _swiftPart.downloadFileWithOptions(std::forward<decltype(options)>(options), onProgress);
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }

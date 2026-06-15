@@ -7,6 +7,11 @@
 
 import Foundation
 
+typealias NitroDownloadRequestOptions = (
+    method: String?,
+    headers: [String: String]?
+)
+
 final class NitroFSFileDownloader: NSObject {
     private weak var fileManager: FileManager?
     private var downloadTask: URLSessionDownloadTask?
@@ -22,6 +27,7 @@ final class NitroFSFileDownloader: NSObject {
     func downloadFile(
         _ serverUrl: String,
         _ destinationPath: String,
+        requestOptions: NitroDownloadRequestOptions? = nil,
         onProgress: ((Double, Double) -> Void)? = nil
     ) async throws -> NitroFile {
         guard fileManager != nil else {
@@ -31,7 +37,7 @@ final class NitroFSFileDownloader: NSObject {
         self.onProgress = onProgress
         self.destinationPath = destinationPath
         
-        let request = try makeRequest(serverUrl: serverUrl)
+        let request = try makeRequest(serverUrl: serverUrl, requestOptions: requestOptions)
         
         let session: URLSession = {
             let config = URLSessionConfiguration.default
@@ -53,15 +59,21 @@ final class NitroFSFileDownloader: NSObject {
     
     // MARK: - Private Methods
     
-    private func makeRequest(serverUrl: String) throws -> URLRequest {
+    private func makeRequest(
+        serverUrl: String,
+        requestOptions: NitroDownloadRequestOptions?
+    ) throws -> URLRequest {
         guard let encoded = serverUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
               let url = URL(string: encoded) else {
             throw URLError(.badURL)
         }
         
         var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        request.httpMethod = requestOptions?.method ?? "GET"
         request.cachePolicy = .reloadIgnoringLocalCacheData
+        requestOptions?.headers?.forEach { key, value in
+            request.setValue(value, forHTTPHeaderField: key)
+        }
         return request
     }
     

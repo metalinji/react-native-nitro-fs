@@ -1,6 +1,12 @@
 
 import { type HybridObject } from 'react-native-nitro-modules'
-import type { NitroFile, NitroFileEncoding, NitroFileStat, NitroUploadOptions } from '../type'
+import type {
+ NitroDownloadOptions,
+ NitroFile,
+ NitroFileEncoding,
+ NitroFileStat,
+ NitroUploadOptions,
+} from '../type'
 
 export interface NitroFS extends HybridObject<{ ios: 'swift', android: 'kotlin' }> {
     /**
@@ -148,5 +154,13 @@ export interface NitroFS extends HybridObject<{ ios: 'swift', android: 'kotlin' 
      * console.log(file) // { name: 'file.txt', mimeType: 'text/plain', path: 'file.txt' }
      * ```
      */
-    downloadFile(serverUrl: string, destinationPath: string, onProgress?: (downloadedBytes: number, totalBytes: number) => void): Promise<NitroFile>
+ downloadFile(serverUrl: string, destinationPath: string, onProgress?: (downloadedBytes: number, totalBytes: number) => void): Promise<NitroFile>
+ /**
+ * Download a file from the internet to the file system with request options.
+ * Supports custom headers for authenticated/tenant-scoped downloads.
+ */
+ downloadFileWithOptions(
+  options: NitroDownloadOptions,
+  onProgress?: (downloadedBytes: number, totalBytes: number) => void
+ ): Promise<NitroFile>
 }

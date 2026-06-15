@@ -181,10 +181,30 @@ class HybridNitroFS: HybridNitroFSSpec {
                 return try await self.nitroFSImpl.downloadFile(
                     serverUrl: serverUrl,
                     destinationPath: destinationPath,
+                    requestHeaders: nil,
                     onProgress: onProgress
                 )
             } catch {
                 os_log("failed to upload file: \(error.localizedDescription)")
+                throw error
+            }
+        }
+    }
+
+    func downloadFileWithOptions(
+        options: NitroDownloadOptions,
+        onProgress: ((Double, Double) -> Void)?
+    ) throws -> NitroModules.Promise<NitroFile> {
+        return .async { [unowned self] in
+            do {
+                return try await self.nitroFSImpl.downloadFile(
+                    serverUrl: options.serverUrl,
+                    destinationPath: options.destinationPath,
+                    requestHeaders: options.headers,
+                    onProgress: onProgress
+                )
+            } catch {
+                os_log("failed to download file with options: \(error.localizedDescription)")
                 throw error
             }
         }
