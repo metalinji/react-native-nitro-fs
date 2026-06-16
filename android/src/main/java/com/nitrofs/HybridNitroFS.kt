@@ -1,14 +1,9 @@
-package com.nitrofs
+package com.margelo.nitro.nitrofs
 
 import android.util.Log
 import com.margelo.nitro.NitroModules
 import com.margelo.nitro.core.Promise
-import com.margelo.nitro.nitrofs.HybridNitroFSSpec
-import com.margelo.nitro.nitrofs.NitroDownloadOptions
-import com.margelo.nitro.nitrofs.NitroFile
-import com.margelo.nitro.nitrofs.NitroFileEncoding
-import com.margelo.nitro.nitrofs.NitroFileStat
-import com.margelo.nitro.nitrofs.NitroUploadOptions
+import com.nitrofs.NitroFSImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
